@@ -2,7 +2,7 @@
   "name": "jasmine-phantom-node",
   "version": "0.0.1",
   "description": "A Runner for Jasmine tests in phantomjs",
-  "main": "./lib/runner.js", 
+  "main": "./lib/jasmine-phantom-node/runner.js",
   "scripts": {
     "test": "jasmine-node --coffee --color"
   },

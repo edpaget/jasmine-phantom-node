@@ -13,16 +13,23 @@ help = ->
   process.exit()
 
 class JasminePhantomNode
+  @exec: (options) ->
+    new @(options)
+
   options:
-    port: 9294
-    url: "http://localhost:#{@port}/test"
+    port: argv.port or 9294
+    url: argv.url or "test"
 
   constructor: (options) ->
     options[key] = value for key, value of options
+    @startPhantom()
 
+  startPhantom: ->
     phantom.create (ph) =>
       ph.createPage (page) =>
-        page.open @options.url, (status) ->
+        console.log "Opening ", "http://localhost:#{@options.port}/#{@options.url}"
+        page.open "http://localhost:#{@options.port}/#{@options.url}", (status) ->
           console.log "Opened?", status
+          ph.exit()
 
-module.exports = Runner
+module.exports = JasminePhantomNode

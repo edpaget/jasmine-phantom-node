@@ -1,4 +1,16 @@
 phantom = require 'phantom'
+optimist = require 'optimist'
+
+argv = optimist.usage([
+  ' usage: jasmine-phantom-node'
+].join('\n'))
+  .alias('p', 'port')
+  .alias('u', 'url')
+  .argv
+
+help = ->
+  optimist.showHelp()
+  process.exit()
 
 class JasminePhantomNode
   options:

@@ -1,4 +1,5 @@
 optimist = require 'optimist'
+fs = require 'fs'
 {exec} = require 'child_process'
 color = require('ansi-color').set
 
@@ -27,13 +28,14 @@ class JasminePhantomNode
     @startPhantom()
 
   startPhantom: =>
-    phantom = exec "phantomjs #{@phantomScript} http://localhost:#{@options.port}/#{@options.url} #{@options.timeout}", (err, stdout, stderr) =>
+    phantom = exec "phantomjs #{@phantomScript()} http://localhost:#{@options.port}/#{@options.url} #{@options.timeout}", (err, stdout, stderr) =>
       if err
         console.log err
         throw err
       @processOutput(stdout)
 
-  phantomScript: "lib/jasmine-phantom-node/phantomjs/phantom.js"
+  phantomScript: ->
+    fs.realpathSync "lib/jasmine-phantom-node/phantomjs/phantom.js"
 
   processOutput: (json) ->
     results = JSON.parse(json)

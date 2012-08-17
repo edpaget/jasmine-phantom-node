@@ -31,6 +31,7 @@ class JasminePhantomNode
 
   startPhantom: ->
     phantom.create (ph) =>
+      phantom.injectJs 'phantomjs/lib/results/js'
       ph.createPage (page) =>
         console.log "Opening ", "http://localhost:#{@options.port}/#{@options.url}"
 
@@ -40,6 +41,7 @@ class JasminePhantomNode
 
         page.open "http://localhost:#{@options.port}/#{@options.url}", (status) ->
           page.onLoadFinished = ->
+            consoel.log "Loaded"
             if status isnt 'success'
               console.log "Unable to open page"
               phantom.exit(1)
@@ -58,6 +60,7 @@ class JasminePhantomNode
         trace: trace
 
   onConsoleMessage: (msg, line, source) ->
+    console.log msg
     if /^RUNNER_END$/.test(msg)
       result = page.evaluate -> window.reporter.runnerResult
       consoe.log JSON.stringify(new Result(result, @logs, @errors, @options).process())
@@ -71,7 +74,8 @@ class JasminePhantomNode
   onIntialized: ->
     page.injectJs 'phantomjs/lib/console.js'
     page.injectJs 'phantomjs/lib/reporter.js'
-    page.injectJs 'phantomjs/lib/result/js'
+
+    console.log "Initialized"
 
     page.evaluate ->
       window.onload = ->

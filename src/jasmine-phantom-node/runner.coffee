@@ -1,5 +1,6 @@
 optimist = require 'optimist'
-{spawn, exec} = require 'child_process'
+{exec} = require 'child_process'
+color = require('ansi-color').set
 
 argv = optimist.usage([
   ' usage: jasmine-phantom-node'
@@ -36,9 +37,30 @@ class JasminePhantomNode
 
   processOutput: (json) ->
     results = JSON.parse(json)
+    passedSuites = new Array
+    failedSuites = new Array
+    for suite in results['suites']
+      if suite['passed']
+        passedSuites << suite
+      else
+        failedSuites << suite
+    
+    @logPassed passedSuites
+    @logFailed failedSuites
+    @logStats results['stats']
+
     if results['passed']
       process.exit 0
     else
       process.exit 1
+
+  logPassed: (specs) ->
+    console.log
+
+  logFailed: (specs) ->
+  logStats: (stats) ->
+    outColor = if stats['failures'] == 0 then 'green' else 'red'
+    output = "Specs: #{stats['specs']}, Failures: #{stats['failures']}, Time: #{stats['time']}"
+    console.log color(output, outColor)
 
 module.exports = JasminePhantomNode

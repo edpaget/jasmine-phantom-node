@@ -52,6 +52,9 @@ page.onInitialized = ->
       window.resultReceived = false
       window.reporter = new ConsoleReporter()
       jasmine.getEnv().addReporter(window.reporter)
+      for key of specs.modules
+        specs(key)
+      jasmine.getEnv().execute()
 
 # Open web page and run the Jasmine test runner
 #

@@ -31,7 +31,7 @@ class JasminePhantomNode
 
   startPhantom: ->
     phantom.create (ph) =>
-      phantom.injectJs 'phantomjs/lib/results/js'
+      ph.injectJs 'phantomjs/lib/results/js'
       ph.createPage (page) =>
         console.log "Opening ", "http://localhost:#{@options.port}/#{@options.url}"
 

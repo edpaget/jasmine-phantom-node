@@ -1,5 +1,5 @@
-phantom = require 'phantom'
 optimist = require 'optimist'
+{spawn, exec} = require 'child_process'
 
 argv = optimist.usage([
   ' usage: jasmine-phantom-node'
@@ -16,10 +16,6 @@ class JasminePhantomNode
   @exec: (options) ->
     new @(options)
 
-  currenSpecId: -1
-  logs: {}
-  errors: {}
-
   options:
     port: argv.port or 9294
     url: argv.url or "test"
@@ -29,84 +25,20 @@ class JasminePhantomNode
     @options[key] = value for key, value of options
     @startPhantom()
 
-  startPhantom: ->
-    phantom.create (ph) =>
-      ph.injectJs 'phantomjs/lib/results/js'
-      ph.createPage (page) =>
-        console.log "Opening ", "http://localhost:#{@options.port}/#{@options.url}"
+  startPhantom: =>
+    phantom = exec "phantomjs #{@phantomScript} http://localhost:#{@options.port}/#{@options.url} #{@options.timeout}", (err, stdout, stderr) =>
+      if err
+        console.log err
+        throw err
+      @processOutput(stdout)
 
-        page.onError = @onError
-        page.onConsoleMesage = @onConsoleMessage
-        page.onInitialize = @onInitialized
+  phantomScript: "lib/jasmine-phantom-node/phantomjs/phantom.js"
 
-        page.open "http://localhost:#{@options.port}/#{@options.url}", (status) ->
-          page.onLoadFinished = ->
-            consoel.log "Loaded"
-            if status isnt 'success'
-              console.log "Unable to open page"
-              phantom.exit(1)
-            else
-              done = -> phantom.exit()
-              @waitFor specsReady, done, @options.timeout
-        
-        specsReady = ->
-          page.evaluate -> window.resultReceived
-
-  onError: (msg, trace) ->
-    if @currentSpecId and @currentSpecID isnt -1
-      @errors[@currentSpecId] ||= []
-      @errors[@currentSpecId].push
-        msg: msg
-        trace: trace
-
-  onConsoleMessage: (msg, line, source) ->
-    console.log msg
-    if /^RUNNER_END$/.test(msg)
-      result = page.evaluate -> window.reporter.runnerResult
-      consoe.log JSON.stringify(new Result(result, @logs, @errors, @options).process())
-      page.evalute -> window.resultReceived = true
-    else if /^SPEC_START: (\d+)$/.test(msg)
-      @currentSpecId = Number(RegExp.$1)
-      @logs[@currentSpecId] = []
+  processOutput: (json) ->
+    results = JSON.parse(json)
+    if results['passed']
+      process.exit 0
     else
-      @logs[currentSpectId].push(msg) if @currentSpecId isnt -1
-
-  onIntialized: ->
-    page.injectJs 'phantomjs/lib/console.js'
-    page.injectJs 'phantomjs/lib/reporter.js'
-
-    console.log "Initialized"
-
-    page.evaluate ->
-      window.onload = ->
-        window.resultReceived = false
-        window.reporter = new ConsoleReporter()
-        jasmine.getEnv().addReporter(window.reporter)
-
-  waitFor: (test, ready, timeout = 5000) ->
-    start = new Date().getTime()
-    condition = false
-
-    wait = ->
-      if (new Date().getTime() - start < timeout) and not condition
-        condition = test()
-      else
-        if not condition
-          text = page.evaluate -> document.getElementsByTagName('body')[0]?.innerText
-          if text
-            error = """
-                    Timeout waiting for the Jasmine rest results!
-
-                    #{ text }
-                    """
-            console.log JSON.stringify({ error: error })
-          else
-            console.log JSON.stringify({ error: 'Timeout waiting for the Jasmine test results!' })
-            phantom.exit(1)
-        else
-          ready()
-          clearInterval interval
-
-    interval = setInterval wait, 250
+      process.exit 1
 
 module.exports = JasminePhantomNode

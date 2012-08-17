@@ -86,6 +86,8 @@ class ConsoleReporter
       time: runtime
     }
 
+    console.log @runnerResult
+
     # Delay the end runner message, so that logs and errors can be retreived in between
     end = -> console.log "RUNNER_END"
     setTimeout end, 10
@@ -127,6 +129,7 @@ class ConsoleReporter
   # @param message [String] the log message
   #
   log: (message) ->
+    console.log message
 
 
 if typeof module isnt 'undefined' and module.exports

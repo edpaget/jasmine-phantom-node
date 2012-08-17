@@ -2,7 +2,7 @@
   "name": "jasmine-phantom-node",
   "version": "0.0.1",
   "description": "A Runner for Jasmine tests in phantomjs",
-  "main": "index.js",
+  "main": "./lib/runner.js", 
   "scripts": {
     "test": "jasmine-node --coffee --color"
   },
@@ -18,7 +18,7 @@
     "headless",
     "ci"
   ],
-  "bin": { "jasmine-phantom-node": "./bin/jasmine-pantom-node" },
+  "bin": { "jasmine-phantom-node": "./bin/jasmine-phantom-node" },
   "author": "Ed Paget",
   "license": "GPL",
   "dependencies": {

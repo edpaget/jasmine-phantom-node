@@ -24,3 +24,5 @@ class JasminePhantomNode
       ph.createPage (page) =>
         page.open @options.url, (status) ->
           console.log "Opened?", status
+
+module.exports = Runner

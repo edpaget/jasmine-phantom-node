@@ -8,4 +8,7 @@ class JasminePhantomNode
   constructor: (options) ->
     options[key] = value for key, value of options
 
-    phantom.create 
+    phantom.create (ph) =>
+      ph.createPage (page) =>
+        page.open @options.url, (status) ->
+          console.log "Opened?", status

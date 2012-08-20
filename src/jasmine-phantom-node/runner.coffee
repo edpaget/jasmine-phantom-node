@@ -42,14 +42,11 @@ class JasminePhantomNode
     results = JSON.parse(json)
     passedSuites = new Array
     failedSuites = new Array
-    for suite in results['suites']
-      if suite['passed']
-        passedSuites << suite
-      else
-        failedSuites << suite
-    
-    @logPassed passedSuites
-    @logFailed failedSuites
+
+    @logSuites results['suites']
+
+    @logFailed results['suites']
+
     @logStats results['stats']
 
     if results['passed']
@@ -57,14 +54,43 @@ class JasminePhantomNode
     else
       process.exit 1
 
-  logPassed: (specs) ->
-    console.log
+  logSuites: (suites, tabDepth = 0) ->
+    for suite in suites
+      outColor = if suite.passed then 'green' else 'red'
+      output = @tabs(tabDepth) + suite.description
+      console.log color(output, outColor)
+      for spec in suite.specs
+        outColor = if spec.passed then 'green' else 'red'
+        output = @tabs(tabDepth + 1) + spec.description
+        console.log color(output, outColor)
+      if suite.suites
+        @logSuites(suite.suites, tabDepth + 1)
 
-  logFailed: (specs) ->
+  logFailed: (suites, description = []) ->
+    for suite in suites
+      if suite.passed is false
+        for spec in suite.specs
+          if spec.passed is false
+            console.log "\n"
+            console.log color(description.join(" ") + " " + spec.description,
+                              "red")
+            console.log color(spec.messages, "red")
+        description.push suite.description
+        @logFailed suite.suites, description
+
+  tabs: (number) ->
+    if number is 0
+      return "\n"
+    else
+      tabs = new String
+      [1..number].forEach ->
+        tabs = tabs + "  "
+      return tabs
 
   logStats: (stats) ->
     outColor = if stats['failures'] == 0 then 'green' else 'red'
     output = "Specs: #{stats['specs']}, Failures: #{stats['failures']}, Time: #{stats['time']}"
+    console.log "\n"
     console.log color(output, outColor)
 
 module.exports = JasminePhantomNode

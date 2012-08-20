@@ -4,7 +4,7 @@ phantom.injectJs 'lib/result.js'
 
 # Set default values
 options =
-  url: phantom.args[0] || 'http://127.0.0.1:3000/jasmine'
+  url: phantom.args[0] || 'http://127.0.0.1:9294/test'
   timeout: parseInt(phantom.args[1] || 5000)
 
 # Create the web page.
@@ -52,8 +52,9 @@ page.onInitialized = ->
       window.resultReceived = false
       window.reporter = new ConsoleReporter()
       jasmine.getEnv().addReporter(window.reporter)
-      for key of specs.modules
-        specs(key)
+      if (window.hasOwnProperty('specs'))
+        for key of specs.modules
+          specs(key)
       jasmine.getEnv().execute()
 
 # Open web page and run the Jasmine test runner
@@ -81,29 +82,29 @@ specsReady = ->
 # @param [Number] timeout the max amount of time to wait in milliseconds
 #
 waitFor = (test, ready, timeout = 5000) ->
-    start = new Date().getTime()
-    condition = false
+  start = new Date().getTime()
+  condition = false
 
-    wait = ->
-      if (new Date().getTime() - start < timeout) and not condition
-        condition = test()
-      else
-        if not condition
-          text = page.evaluate -> document.getElementsByTagName('body')[0]?.innerText
+  wait = ->
+    if (new Date().getTime() - start < timeout) and not condition
+      condition = test()
+    else
+      if not condition
+        text = page.evaluate -> document.getElementsByTagName('body')[0]?.innerText
 
-          if text
-            error = """
-                    Timeout waiting for the Jasmine test results!
+        if text
+          error = """
+                  Timeout waiting for the Jasmine test results!
 
-                    #{ text }
-                    """
-            console.log JSON.stringify({ error: error })
-          else
-            console.log JSON.stringify({ error: 'Timeout waiting for the Jasmine test results!' })
-
-          phantom.exit(1)
+                  #{ text }
+                  """
+          console.log JSON.stringify({ error: error })
         else
-          ready()
-          clearInterval interval
+          console.log JSON.stringify({ error: 'Timeout waiting for the Jasmine test results!' })
 
-    interval = setInterval wait, 250
+        phantom.exit(1)
+      else
+        ready()
+        clearInterval interval
+
+  interval = setInterval wait, 250

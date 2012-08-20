@@ -8,6 +8,7 @@ argv = optimist.usage([
 ].join('\n'))
   .alias('p', 'port')
   .alias('u', 'url')
+  .alias('t', 'timeout')
   .argv
 
 help = ->
@@ -20,7 +21,7 @@ class JasminePhantomNode
 
   options:
     port: argv.port or 9294
-    url: argv.url or "test"
+    url: argv.url or "/test"
     timeout: argv.timeout or 5000
 
   constructor: (options) ->
@@ -28,14 +29,14 @@ class JasminePhantomNode
     @startPhantom()
 
   startPhantom: =>
-    phantom = exec "phantomjs #{@phantomScript()} http://localhost:#{@options.port}/#{@options.url} #{@options.timeout}", (err, stdout, stderr) =>
+    phantom = exec "phantomjs #{@phantomScript()} http://localhost:#{@options.port}#{@options.url} #{@options.timeout}", (err, stdout, stderr) =>
       if err
         console.log err
         throw err
       @processOutput(stdout)
 
   phantomScript: ->
-    fs.realpathSync "lib/jasmine-phantom-node/phantomjs/phantom.js"
+    __dirname + "/phantomjs/phantom.js"
 
   processOutput: (json) ->
     results = JSON.parse(json)
@@ -60,6 +61,7 @@ class JasminePhantomNode
     console.log
 
   logFailed: (specs) ->
+
   logStats: (stats) ->
     outColor = if stats['failures'] == 0 then 'green' else 'red'
     output = "Specs: #{stats['specs']}, Failures: #{stats['failures']}, Time: #{stats['time']}"

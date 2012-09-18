@@ -19,6 +19,7 @@ help = ->
 
 class JasminePhantomNode
   @exec: (options) ->
+    console.log options
     new @(options)
 
   options:
@@ -29,6 +30,7 @@ class JasminePhantomNode
 
   constructor: (options) ->
     @options[key] = value for key, value of options
+    console.log @options
     @startPhantom()
 
   startPhantom: =>
@@ -41,10 +43,12 @@ class JasminePhantomNode
   phantomScript: ->
     __dirname + "/phantomjs/phantom.js"
 
-  processOutput: (json) ->
+  processOutput: (json) =>
     results = JSON.parse(json)
     passedSuites = new Array
     failedSuites = new Array
+
+    console.log @options
 
     @logSuites results['suites']
 

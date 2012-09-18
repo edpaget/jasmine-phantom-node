@@ -9,7 +9,6 @@ argv = optimist.usage([
   .alias('p', 'port')
   .alias('u', 'url')
   .alias('t', 'timeout')
-  .alias('e', 'exit-on-failure')
   .boolean('e')
   .argv
 

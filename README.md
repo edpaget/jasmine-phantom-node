@@ -6,16 +6,11 @@ I'm definitely accepting ideas for a better name
 
 # Installation
 
-Either add as a `devDependency` to your `package.json`:
+Add as a `devDependency` to your `package.json`:
 ```
 "devDependencies" : {
-  "jasmine-phantom-node" : "0.1.0"
+  "jasmine-phantom-node" : "git://github.com/edpaget/jasmine-phantom-node.git"
 }
-```
-
-or install globally with ;
-```
-npm install -g jasmine-phantom-node
 ```
 
 # Usage

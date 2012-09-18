@@ -1,6 +1,6 @@
 {
   "name": "jasmine-phantom-node",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Runner for Jasmine tests in phantomjs",
   "main": "./lib/jasmine-phantom-node/runner.js",
   "scripts": {

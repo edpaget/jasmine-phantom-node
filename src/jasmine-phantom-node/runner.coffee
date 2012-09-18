@@ -9,6 +9,7 @@ argv = optimist.usage([
   .alias('p', 'port')
   .alias('u', 'url')
   .alias('t', 'timeout')
+  .boolean('exit-on-failure')
   .argv
 
 help = ->
@@ -23,6 +24,7 @@ class JasminePhantomNode
     port: argv.port or 9294
     url: argv.url or "/test"
     timeout: argv.timeout or 5000
+    "exit-on-failure": false
 
   constructor: (options) ->
     @options[key] = value for key, value of options
@@ -51,8 +53,10 @@ class JasminePhantomNode
 
     if results['passed']
       process.exit 0
-    else
+    else if @options['exit-on-failure']
       process.exit 1
+    else
+      process.exit 0
 
   logSuites: (suites, tabDepth = 0) ->
     for suite in suites
@@ -89,7 +93,7 @@ class JasminePhantomNode
 
   logStats: (stats) ->
     outColor = if stats['failures'] == 0 then 'green' else 'red'
-    output = "Specs: #{stats['specs']}, Failures: #{stats['failures']}, Time: #{stats['time']}"
+    output = "Specs: #{stats['specs']}, Failures: #{stats['failures']}, Time: #{stats['time']}s"
     console.log "\n"
     console.log color(output, outColor)
 

@@ -9,6 +9,7 @@ argv = optimist.usage([
   .alias('p', 'port')
   .alias('u', 'url')
   .alias('t', 'timeout')
+  .alias('e', 'exit-on-failure')
   .boolean('e')
   .argv
 
@@ -18,17 +19,16 @@ help = ->
 
 class JasminePhantomNode
   @exec: (options) ->
-    console.log options
     new @(options)
 
   options:
     port: argv.port or 9294
     url: argv.url or "/test"
     timeout: argv.timeout or 5000
+    e: argv.e or false
 
   constructor: (options) ->
     @options[key] = value for key, value of options
-    console.log @options
     @startPhantom()
 
   startPhantom: =>
